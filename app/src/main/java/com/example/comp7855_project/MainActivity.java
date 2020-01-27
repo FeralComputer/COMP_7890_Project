@@ -212,6 +212,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     data.set(3, Tag.getText().toString());
                     PictureDatabase.put(filename, data);
 
+                    Tag.clearFocus();
+
                     // save to file
                     try {
                         FileOutputStream fos = this.openFileOutput("PhotoData.ser", this.MODE_PRIVATE);
@@ -351,12 +353,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         return image;
     }
-
-
-
-
-
-
 
 }
 

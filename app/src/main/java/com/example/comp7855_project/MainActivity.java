@@ -21,8 +21,13 @@ package com.example.comp7855_project;
 //import android.widget.ImageView;
 //import android.widget.TextView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,7 +35,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -40,6 +47,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //import org.w3c.dom.Document;
 //import org.w3c.dom.Element;
@@ -72,23 +82,29 @@ import java.util.Date;
 //import java.util.Date;
 //import java.util.Locale;
 
+
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     public static final int SEARCH_ACTIVITY_REQUEST_CODE = 0;
     static final int CAMERA_REQUEST_CODE = 1;
     private String currentPhotoPath = null;
     private int currentPhotoIndex = 0;
     private ArrayList<String> photoGallery;
+    Map<String, List<String>> PictureDatabase = new HashMap<String, List<String>>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button btnLeft = (Button)findViewById(R.id.btnLeft);
         Button btnRight = (Button)findViewById(R.id.btnRight);
         Button btnFilter = (Button)findViewById(R.id.btnFilter);
+
         btnLeft.setOnClickListener(this);
         btnRight.setOnClickListener(this);
         btnFilter.setOnClickListener(filterListener);
+
+        EditText Tag = (EditText) findViewById(R.id.entryCaption);
 
         Date minDate = new Date(Long.MIN_VALUE);
         Date maxDate = new Date(Long.MAX_VALUE);
@@ -98,14 +114,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentPhotoPath = photoGallery.get(currentPhotoIndex);
         displayPhoto(currentPhotoPath);
     }
-    private View.OnClickListener filterListener = new View.OnClickListener() {
+    public View.OnClickListener filterListener = new View.OnClickListener() {
         public void onClick(View v) {
             Intent i = new Intent(MainActivity.this, SearchActivity.class);
             startActivityForResult(i, SEARCH_ACTIVITY_REQUEST_CODE);
         }
     };
 
-    private ArrayList<String> populateGallery(Date minDate, Date maxDate) {
+    public ArrayList<String> populateGallery(Date minDate, Date maxDate) {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File file = new File(Environment.getExternalStorageDirectory()
                 .getAbsolutePath(), "/Android/data/com.example.comp7855_project/files/Pictures");
         photoGallery = new ArrayList<String>();
@@ -117,9 +134,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return photoGallery;
     }
-    private void displayPhoto(String path) {
+    public void displayPhoto(String path) {
+        try {
+            File f = new File(path);
+            String filename = f.getName();
+            List<String> data = PictureDatabase.get(filename);
+            if (data != null) {
+                TextView Date_Num = (TextView) findViewById(R.id.lblDate_Num);
+                Date_Num.setText(data.get(0));
+
+                TextView Coord = (TextView) findViewById(R.id.lblCoord);
+                Coord.setText(data.get(1) + ", " + data.get(2));
+
+                EditText Tag = (EditText) findViewById(R.id.entryCaption);
+                Tag.setText(data.get(3));
+            }
+        }
+        catch(NullPointerException e) {
+            Log.d("Garbage Language", "Cant handle empty data");
+        }
+
         ImageView iv = (ImageView) findViewById(R.id.ivMain);
-        iv.setImageBitmap(BitmapFactory.decodeFile(path));
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        iv.setImageBitmap(bitmap);
     }
 
     @Override
@@ -144,11 +181,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentPhotoIndex = photoGallery.size() - 1;
 
         currentPhotoPath = photoGallery.get(currentPhotoIndex);
-        Log.d("phpotoleft, size", Integer.toString(photoGallery.size()));
+        Log.d("photoleft, size", Integer.toString(photoGallery.size()));
         Log.d("photoleft, index", Integer.toString(currentPhotoIndex));
         displayPhoto(currentPhotoPath);
     }
-
 
     public void goToSettings(View v) {
         Intent i = new Intent(this, SettingsActivity.class);
@@ -160,8 +196,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         i.putExtra("DISPLAY_TEXT", x);
         startActivity(i);
     }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SEARCH_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
@@ -205,14 +242,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private File createImageFile() throws IOException {
+    public File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName, ".jpg", dir );
         currentPhotoPath = image.getAbsolutePath();
         Log.d("createImageFile", currentPhotoPath);
+
+        //LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        //Criteria criteria = new Criteria();
+        //String bestProvider = locationManager.getBestProvider(criteria, false);
+        //Location location = locationManager.getLastKnownLocation(bestProvider);
+
+        List<String> data = new ArrayList<String>();
+        data.add(timeStamp);
+        data.add("69");
+        data.add("420");
+        data.add("CLICK TO EDIT");
+        PictureDatabase.put(image.getName(), data);
+
         return image;
     }
 
+
 }
+
+//        Tag.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//@Override
+//public void onFocusChange(View v, boolean hasFocus) {
+//        if (!hasFocus) {
+//        try {
+//        File f = new File(photoGallery.get(currentPhotoIndex));
+//        String filename = f.getName();
+//        List<String> data = PictureDatabase.get(filename);
+//        if (data != null) {
+//        EditText Tag = (EditText) findViewById(R.id.entryCaption);
+//        data.set(3,Tag.getText().toString());
+//        }
+//        PictureDatabase.put(filename, data);
+//        }
+//        catch(NullPointerException e) {
+//        Log.d("Garbage Language", "Cant handle empty data");
+//        }
+//        }
+//        }
+//        });
+
+
+//Map<String, List<String>> hm = new HashMap<String, List<String>>();
+//List<String> values = new ArrayList<String>();
+//values.add("Value 1");
+//values.add("Value 2");
+//hm.put("Key1", values);
+//
+//// to get the arraylist
+//System.out.println(hm.get("key1"));

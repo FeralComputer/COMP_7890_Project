@@ -23,6 +23,7 @@ package com.example.comp7855_project;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Criteria;
@@ -31,6 +32,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -40,16 +42,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 
 //import org.w3c.dom.Document;
 //import org.w3c.dom.Element;
@@ -90,12 +104,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private String currentPhotoPath = null;
     private int currentPhotoIndex = 0;
     private ArrayList<String> photoGallery;
-    Map<String, List<String>> PictureDatabase = new HashMap<String, List<String>>();
+    public Map<String, List<String>> PictureDatabase = new HashMap<String, List<String>>();
+    public FusedLocationProviderClient client;
+    public String Latitude;
+    public String Longitude;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        EditText Tag = (EditText) findViewById(R.id.entryCaption);
+        Tag.clearFocus();
         Button btnLeft = (Button)findViewById(R.id.btnLeft);
         Button btnRight = (Button)findViewById(R.id.btnRight);
         Button btnFilter = (Button)findViewById(R.id.btnFilter);
@@ -104,7 +123,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnRight.setOnClickListener(this);
         btnFilter.setOnClickListener(filterListener);
 
-        EditText Tag = (EditText) findViewById(R.id.entryCaption);
+        Latitude = "N/A";
+        Longitude = "N/A";
+
+        ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION}, 1);
+
+        client = LocationServices.getFusedLocationProviderClient(this);
+
+        try
+        {
+            FileInputStream fileInputStream = new FileInputStream(this.getFilesDir()+"/PhotoData.ser");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            PictureDatabase = (Map<String, List<String>>)objectInputStream.readObject();
+        }
+        catch(ClassNotFoundException | IOException | ClassCastException e) {
+            e.printStackTrace();
+        }
 
         Date minDate = new Date(Long.MIN_VALUE);
         Date maxDate = new Date(Long.MAX_VALUE);
@@ -165,6 +199,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onClick( View v) {
+        // update Tag
+        try {
+            if (photoGallery.size() != 0) {
+                File f = new File(photoGallery.get(currentPhotoIndex));
+                String filename = f.getName();
+                List<String> data = PictureDatabase.get(filename);
+                if (data != null) {
+                    EditText Tag = (EditText) findViewById(R.id.entryCaption);
+                    data.set(3, Tag.getText().toString());
+                    PictureDatabase.put(filename, data);
+
+                    // save to file
+                    try {
+                        FileOutputStream fos = this.openFileOutput("PhotoData.ser", this.MODE_PRIVATE);
+                        ObjectOutputStream oos = new ObjectOutputStream(fos);
+                        oos.writeObject(PictureDatabase);
+                        oos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        catch(NullPointerException e) {
+            Log.d("Garbage Language", "Cant handle empty data");
+        }
+
+        client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    Latitude = String.valueOf((int)location.getLatitude());
+                    Longitude = String.valueOf((int)location.getLongitude());
+                }
+                else
+                    Log.d("Location Was Null", Integer.toString(123));
+            }
+        });
+
         switch (v.getId()) {
             case R.id.btnLeft:
                 --currentPhotoIndex;
@@ -175,15 +248,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             default:
                 break;
         }
-        if (currentPhotoIndex < 0)
-            currentPhotoIndex = 0;
         if (currentPhotoIndex >= photoGallery.size())
             currentPhotoIndex = photoGallery.size() - 1;
+        if (currentPhotoIndex < 0)
+            currentPhotoIndex = 0;
 
-        currentPhotoPath = photoGallery.get(currentPhotoIndex);
-        Log.d("photoleft, size", Integer.toString(photoGallery.size()));
-        Log.d("photoleft, index", Integer.toString(currentPhotoIndex));
-        displayPhoto(currentPhotoPath);
+        if (photoGallery.size() != 0) {
+            currentPhotoPath = photoGallery.get(currentPhotoIndex);
+            Log.d("photoleft, size", Integer.toString(photoGallery.size()));
+            Log.d("photoleft, index", Integer.toString(currentPhotoIndex));
+            displayPhoto(currentPhotoPath);
+        }
     }
 
     public void goToSettings(View v) {
@@ -257,13 +332,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         List<String> data = new ArrayList<String>();
         data.add(timeStamp);
-        data.add("69");
-        data.add("420");
+        data.add(Latitude);
+        data.add(Longitude);
         data.add("CLICK TO EDIT");
         PictureDatabase.put(image.getName(), data);
 
+        try
+        {
+            FileOutputStream fos = this.openFileOutput("PhotoData.ser", this.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(PictureDatabase);
+            oos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return image;
     }
+
+
+
+
+
 
 
 }
@@ -298,3 +388,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //
 //// to get the arraylist
 //System.out.println(hm.get("key1"));
+
+//    public Map Load_Map() {
+//        try
+//        {
+//            FileInputStream fileInputStream = new FileInputStream(this.getFilesDir()+"/PhotoData.ser");
+//            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+//            Map myHashMap = (Map)objectInputStream.readObject();
+//
+//            return myHashMap;
+//        }
+//        catch(ClassNotFoundException | IOException | ClassCastException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+//    public void Save_Map(Map<String, List<String>> PictureDatabase) {
+//        try
+//        {
+//            FileOutputStream fos = this.openFileOutput("PhotoData.ser", this.MODE_PRIVATE);
+//            ObjectOutputStream oos = new ObjectOutputStream(fos);
+//            oos.writeObject(PictureDatabase);
+//            oos.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }

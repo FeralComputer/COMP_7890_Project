@@ -121,7 +121,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnLeft.setOnClickListener(this);
         btnRight.setOnClickListener(this);
-        btnFilter.setOnClickListener(filterListener);
+
+        btnFilter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, SearchActivity.class);
+                startActivityForResult(i, SEARCH_ACTIVITY_REQUEST_CODE);
+
+            }
+        });
 
         Latitude = "N/A";
         Longitude = "N/A";
@@ -148,12 +156,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentPhotoPath = photoGallery.get(currentPhotoIndex);
         displayPhoto(currentPhotoPath);
     }
-    public View.OnClickListener filterListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            Intent i = new Intent(MainActivity.this, SearchActivity.class);
-            startActivityForResult(i, SEARCH_ACTIVITY_REQUEST_CODE);
-        }
-    };
 
     public ArrayList<String> populateGallery(Date minDate, Date maxDate) {
         File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);

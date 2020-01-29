@@ -57,8 +57,13 @@ class MainActivityTest {
     fun check_filter_function() {
         onView(withId(R.id.btnFilter)).perform(click())
         onView(withId(R.id.activity_search)).check(matches(isDisplayed()))
-        onView(withId(R.id.search_fromDate)).perform(typeText("20200124"),closeSoftKeyboard())
-        onView(withId(R.id.search_toDate)).perform(typeText("20200125"),closeSoftKeyboard())
+        onView(withId(R.id.search_fromYear)).perform(typeText("2019"))
+        onView(withId(R.id.search_toYear)).perform(typeText("2020"))
+        onView(withId(R.id.search_fromMonth)).perform(typeText("01"))
+        onView(withId(R.id.search_toMonth)).perform(typeText("02"))
+        onView(withId(R.id.search_fromDay)).perform(typeText("12"))
+        onView(withId(R.id.search_toDay)).perform(typeText("30"), closeSoftKeyboard())
+
         onView(withId(R.id.search_cancel)).perform(click())
     }
 }

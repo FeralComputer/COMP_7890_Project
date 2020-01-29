@@ -34,23 +34,31 @@
         android:layout_alignParentStart="true"
         android:layout_marginLeft="11dp"
         android:layout_marginStart="11dp" />
+
     <Button
         android:id="@+id/btnRight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="right"
         android:layout_alignBaseline="@+id/btnLeft"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="11dp"
+        android:text="right" />
+
     <Button
         android:id="@+id/btnFilter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="filter"
         android:layout_alignBaseline="@+id/btnCamera"
         android:layout_alignBottom="@+id/btnCamera"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginEnd="14dp"
+        android:layout_marginRight="11dp"
+        android:layout_marginBottom="0dp"
+        android:text="Search" />
+
     <Button
         android:id="@+id/btnCamera"
         android:layout_width="wrap_content"
@@ -69,7 +77,7 @@
         android:layout_alignStart="@+id/btnLeft"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="-1dp"
-        android:layout_marginBottom="263dp"
+        android:layout_marginBottom="225dp"
         android:text="Caption:"
         android:textSize="20dp" />
 
@@ -80,7 +88,7 @@
         android:layout_alignStart="@+id/btnLeft"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="76dp"
-        android:layout_marginBottom="250dp"
+        android:layout_marginBottom="215dp"
         android:layout_weight="1"
         android:gravity="left|center_vertical"
         android:imeOptions="actionDone"
@@ -94,7 +102,7 @@
         android:layout_alignStart="@+id/btnLeft"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="-1dp"
-        android:layout_marginBottom="324dp"
+        android:layout_marginBottom="325dp"
         android:text="Location:"
         android:textSize="20dp" />
     <TextView
@@ -104,7 +112,7 @@
         android:layout_alignStart="@+id/btnLeft"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="85dp"
-        android:layout_marginBottom="324dp"
+        android:layout_marginBottom="325dp"
         android:text="000, 000"
         android:textSize="20dp" />
     <TextView
@@ -114,17 +122,40 @@
         android:layout_alignStart="@+id/btnLeft"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="1dp"
-        android:layout_marginBottom="296dp"
+        android:layout_marginBottom="295dp"
         android:text="Date:"
         android:textSize="20dp" />
     <TextView
         android:id="@+id/lblDate_Num"
-        android:layout_width="200dp"
+        android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/btnLeft"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="55dp"
         android:layout_marginBottom="295dp"
-        android:text="12345678_123456"
+        android:text="April 20, 2020"
         android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/lblTime"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/btnLeft"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="-1dp"
+        android:layout_marginBottom="260dp"
+        android:text="Time:"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/lblTime_Num"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/btnLeft"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="55dp"
+        android:layout_marginBottom="260dp"
+        android:text="4:20 pm"
+        android:textSize="20dp" />
+
 </RelativeLayout>

@@ -56,6 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -112,6 +113,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public String Longitude;
     public Date minDate = new Date(Long.MIN_VALUE);
     public Date maxDate = new Date(Long.MAX_VALUE);
+    DateFormatSymbols dfs = new DateFormatSymbols();
+    public String[] months = dfs.getMonths();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -221,7 +224,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             List<String> data = PictureDatabase.get(filename);
             if (data != null) {
                 TextView Date_Num = (TextView) findViewById(R.id.lblDate_Num);
-                Date_Num.setText(data.get(0));
+                Date_Num.setText(months[Integer.valueOf(data.get(0).substring(4,6))] + " " + data.get(0).substring(6,8) + ", " + data.get(0).substring(0,4));
+
+                TextView Time_Num = (TextView) findViewById(R.id.lblTime_Num);
+                if (Integer.valueOf(data.get(0).substring(9,11)) >= 13)
+                    Time_Num.setText(String.valueOf(Integer.valueOf(data.get(0).substring(9,11)) - 12) + " : " + data.get(0).substring(11,13) + " pm");
+                else if (Integer.valueOf(data.get(0).substring(9,11)) == 12)
+                    Time_Num.setText(data.get(0).substring(9,11) + " : " + data.get(0).substring(11,13) + " pm");
+                else
+                    Time_Num.setText(data.get(0).substring(9,11) + " : " + data.get(0).substring(11,13) + " am");
 
                 TextView Coord = (TextView) findViewById(R.id.lblCoord);
                 Coord.setText(data.get(1) + ", " + data.get(2));

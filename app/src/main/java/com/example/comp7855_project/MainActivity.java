@@ -48,6 +48,7 @@ import androidx.core.content.FileProvider;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -55,6 +56,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public FusedLocationProviderClient client;
     public String Latitude;
     public String Longitude;
+    public Date minDate = new Date(Long.MIN_VALUE);
+    public Date maxDate = new Date(Long.MAX_VALUE);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -148,8 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
 
-        Date minDate = new Date(Long.MIN_VALUE);
-        Date maxDate = new Date(Long.MAX_VALUE);
+
         photoGallery = populateGallery(minDate, maxDate);
         Log.d("onCreate, size", Integer.toString(photoGallery.size()));
         if (photoGallery.size() > 0)
@@ -165,11 +168,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         File[] fList = file.listFiles();
         if (fList != null) {
             for (File f : file.listFiles()) {
-                photoGallery.add(f.getPath());
+                String fileDate = f.getName().split("_")[1];
+                Date d = new Date(Long.MIN_VALUE);
+                try{
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                    d = dateFormat.parse(fileDate);
+                }catch(ParseException ex){
+                    // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
+                }
+                if(d.after(minDate) && d.before(maxDate))
+                {
+                    photoGallery.add(f.getPath());
+                }
             }
         }
         return photoGallery;
     }
+
+    public ArrayList<String> populateGallery(Date minDate, Date maxDate, String caption) {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File file = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath(), "/Android/data/com.example.comp7855_project/files/Pictures");
+        photoGallery = new ArrayList<String>();
+        File[] fList = file.listFiles();
+        if (fList != null) {
+            for (File f : file.listFiles()) {
+                String fileDate = f.getName().split("_")[1];
+                Date d = new Date(Long.MIN_VALUE);
+                try{
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                    d = dateFormat.parse(fileDate);
+                }catch(ParseException ex){
+                    // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
+                }
+                if(d.after(minDate) && d.before(maxDate))
+                {
+                    String filename = f.getName();
+                    List<String> data = PictureDatabase.get(filename);
+                    String name = data.get(3);
+                    if (name.equals(caption))
+                        photoGallery.add(f.getPath());
+                }
+            }
+        }
+        return photoGallery;
+    }
+
     public void displayPhoto(String path) {
         try {
             File f = new File(path);
@@ -283,19 +327,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (resultCode == RESULT_OK) {
                 Log.d("createImageFile", data.getStringExtra("STARTDATE"));
                 Log.d("createImageFile", data.getStringExtra("ENDDATE"));
+                Log.d("createImageFile", data.getStringExtra("TAG"));
 
-                photoGallery = populateGallery(new Date(), new Date());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                Date d1 = new Date(Long.MIN_VALUE);
+                Date d2 = new Date(Long.MAX_VALUE);
+                try{
+                    d1 = dateFormat.parse(data.getStringExtra("STARTDATE"));
+                }catch(ParseException ex){
+                    // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
+                }
+                try{
+                    d2 = dateFormat.parse(data.getStringExtra("ENDDATE"));
+                }catch(ParseException ex){
+                    // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
+                }
+                String Tag;
+                if (!data.getStringExtra("TAG").isEmpty()) {
+                    Tag = data.getStringExtra("TAG");
+                    photoGallery = populateGallery(d1, d2, Tag);
+                }
+                else
+                    photoGallery = populateGallery(d1, d2);
+
                 Log.d("onCreate, size", Integer.toString(photoGallery.size()));
-                currentPhotoIndex = 0;
-                currentPhotoPath = photoGallery.get(currentPhotoIndex);
-                displayPhoto(currentPhotoPath);
+                Snackbar mySnackbar = Snackbar.make(findViewById(R.id.activity_main), "No Results Found", Snackbar.LENGTH_SHORT);
+                if (photoGallery.size() != 0) {
+                    currentPhotoIndex = 0;
+                    currentPhotoPath = photoGallery.get(currentPhotoIndex);
+                    displayPhoto(currentPhotoPath);
+
+                    mySnackbar = Snackbar.make(findViewById(R.id.activity_main), String.valueOf(photoGallery.size()) + "Result(s) Found", Snackbar.LENGTH_SHORT);
+                }
+                else
+                {
+                    photoGallery = populateGallery(minDate, maxDate);
+                    currentPhotoIndex = 0;
+                    currentPhotoPath = photoGallery.get(currentPhotoIndex);
+                    displayPhoto(currentPhotoPath);
+                }
+                mySnackbar.show();
+
             }
         }
         if (requestCode == CAMERA_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Log.d("createImageFile", "Picture Taken");
-                photoGallery = populateGallery(new Date(), new Date());
-                currentPhotoIndex = 0;
+                photoGallery = populateGallery(minDate, maxDate);
+                currentPhotoIndex = photoGallery.size() - 1;
                 currentPhotoPath = photoGallery.get(currentPhotoIndex);
                 displayPhoto(currentPhotoPath);
             }

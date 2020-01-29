@@ -138,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+
+
         Latitude = "N/A";
         Longitude = "N/A";
 
@@ -162,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             currentPhotoPath = photoGallery.get(currentPhotoIndex);
         displayPhoto(currentPhotoPath);
     }
+
 
     public ArrayList<String> populateGallery(Date minDate, Date maxDate) {
         File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);

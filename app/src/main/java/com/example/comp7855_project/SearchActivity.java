@@ -25,6 +25,9 @@ public class SearchActivity extends AppCompatActivity {
     private EditText toDate_Month;
     private EditText toDate_Day;
     private EditText Tag;
+    private EditText location_X;
+    private EditText location_Y;
+    private EditText location_Radius;
     private Calendar fromCalendar;
     private Calendar toCalendar;
     private DatePickerDialog.OnDateSetListener fromListener;
@@ -41,6 +44,10 @@ public class SearchActivity extends AppCompatActivity {
         toDate_Month   = findViewById(R.id.search_toMonth);
         toDate_Day   = findViewById(R.id.search_toDay);
         Tag = findViewById(R.id.search_Tag);
+        location_X = findViewById(R.id.search_LocationX);
+        location_Y = findViewById(R.id.search_LocationY);
+        location_Radius = findViewById(R.id.search_Radius);
+
         Button Btn_search = findViewById(R.id.search_cancel);
         Button Btn_cancel = findViewById(R.id.search_search);
 

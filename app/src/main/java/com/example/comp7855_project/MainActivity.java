@@ -125,9 +125,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnLeft = (Button)findViewById(R.id.btnLeft);
         Button btnRight = (Button)findViewById(R.id.btnRight);
         Button btnFilter = (Button)findViewById(R.id.btnFilter);
+        Button btnCamera = (Button)findViewById(R.id.btnCamera);
 
         btnLeft.setOnClickListener(this);
         btnRight.setOnClickListener(this);
+        btnCamera.setOnClickListener(this);
 
         btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +165,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (photoGallery.size() > 0)
             currentPhotoPath = photoGallery.get(currentPhotoIndex);
         displayPhoto(currentPhotoPath);
+
+        client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    Latitude = String.valueOf((int)location.getLatitude());
+                    Longitude = String.valueOf((int)location.getLongitude());
+                }
+                else
+                    Log.d("Location Was Null", Integer.toString(123));
+            }
+        });
     }
 
 
@@ -307,6 +321,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnRight:
                 ++currentPhotoIndex;
                 break;
+            case R.id.btnCamera:
+                takePicture();
+                break;
             default:
                 break;
         }
@@ -395,7 +412,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void takePicture(View v) {
+    public void takePicture() {
+        EditText Tag = (EditText) findViewById(R.id.entryCaption);
+        Tag.clearFocus();
+
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;

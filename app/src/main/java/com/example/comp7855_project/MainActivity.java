@@ -45,6 +45,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
+import com.example.comp7855_project.Social_Interface.Social_Share;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -126,10 +127,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnRight = (Button)findViewById(R.id.btnRight);
         Button btnFilter = (Button)findViewById(R.id.btnFilter);
         Button btnCamera = (Button)findViewById(R.id.btnCamera);
+        Button btnShare = (Button)findViewById(R.id.btnShare);
 
         btnLeft.setOnClickListener(this);
         btnRight.setOnClickListener(this);
         btnCamera.setOnClickListener(this);
+        btnShare.setOnClickListener(this);
 
         btnFilter.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -324,6 +327,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnCamera:
                 takePicture();
                 break;
+            case R.id.btnShare:
+                String extra_text=((EditText)findViewById(R.id.entryCaption)).getText().toString();
+                Social_Share.share(extra_text,currentPhotoPath,this);
             default:
                 break;
         }

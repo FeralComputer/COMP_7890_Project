@@ -143,8 +143,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
-
         Latitude = "N/A";
         Longitude = "N/A";
 
@@ -228,9 +226,80 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 {
                     String filename = f.getName();
                     List<String> data = PictureDatabase.get(filename);
-                    String name = data.get(3);
-                    if (name.equals(caption))
-                        photoGallery.add(f.getPath());
+                    if(data != null) {
+                        String name = data.get(3);
+                        if (name.equals(caption))
+                            photoGallery.add(f.getPath());
+                    }
+                }
+            }
+        }
+        return photoGallery;
+    }
+
+    public ArrayList<String> populateGallery(Date minDate, Date maxDate, double x, double y, double rad) {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File file = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath(), "/Android/data/com.example.comp7855_project/files/Pictures");
+        photoGallery = new ArrayList<String>();
+        File[] fList = file.listFiles();
+        if (fList != null) {
+            for (File f : file.listFiles()) {
+                String fileDate = f.getName().split("_")[1];
+                Date d = new Date(Long.MIN_VALUE);
+                try{
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                    d = dateFormat.parse(fileDate);
+                }catch(ParseException ex){
+                    // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
+                }
+                if(d.after(minDate) && d.before(maxDate))
+                {
+                    String filename = f.getName();
+                    List<String> data = PictureDatabase.get(filename);
+                    if(data != null && !data.get(1).equals("N/A")) {
+                        Double xval = Double.valueOf(data.get(1));
+                        Double yval = Double.valueOf(data.get(2));
+                        if (Math.sqrt((x - xval) * (x - xval) + (y - yval) * (y - yval)) < rad) {
+                            photoGallery.add(f.getPath());
+                        }
+                    }
+                }
+            }
+        }
+        return photoGallery;
+    }
+
+    public ArrayList<String> populateGallery(Date minDate, Date maxDate, String caption, double x, double y, double rad) {
+        File dir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File file = new File(Environment.getExternalStorageDirectory()
+                .getAbsolutePath(), "/Android/data/com.example.comp7855_project/files/Pictures");
+        photoGallery = new ArrayList<String>();
+        File[] fList = file.listFiles();
+        if (fList != null) {
+            for (File f : file.listFiles()) {
+                String fileDate = f.getName().split("_")[1];
+                Date d = new Date(Long.MIN_VALUE);
+                try{
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+                    d = dateFormat.parse(fileDate);
+                }catch(ParseException ex){
+                    // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
+                }
+                if(d.after(minDate) && d.before(maxDate))
+                {
+                    String filename = f.getName();
+                    List<String> data = PictureDatabase.get(filename);
+                    if(data != null && !data.get(1).equals("N/A")) {
+                        Double xval = Double.valueOf(data.get(1));
+                        Double yval = Double.valueOf(data.get(2));
+                        if (Math.sqrt((x - xval)*(x - xval) + (y - yval)*(y - yval)) < rad)
+                        {
+                                String name = data.get(3);
+                                if (name.equals(caption))
+                                    photoGallery.add(f.getPath());
+                            }
+                    }
                 }
             }
         }
@@ -330,6 +399,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnShare:
                 String extra_text=((EditText)findViewById(R.id.entryCaption)).getText().toString();
                 Social_Share.share(extra_text,currentPhotoPath,this);
+                break;
             default:
                 break;
         }
@@ -379,10 +449,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }catch(ParseException ex){
                     // handle parsing exception if date string was different from the pattern applying into the SimpleDateFormat contructor
                 }
-                String Tag;
-                if (!data.getStringExtra("TAG").isEmpty()) {
-                    Tag = data.getStringExtra("TAG");
+
+                if (!data.getStringExtra("TAG").isEmpty() && !data.getStringExtra("RAD").isEmpty()) {
+                    String Tag = data.getStringExtra("TAG");
+                    Double x = Double.valueOf(data.getStringExtra("LOCX"));
+                    Double y = Double.valueOf(data.getStringExtra("LOCY"));
+                    Double rad = Double.valueOf(data.getStringExtra("RAD"));
+                    photoGallery = populateGallery(d1, d2, Tag, x, y, rad);
+                }
+                else if (!data.getStringExtra("TAG").isEmpty() && data.getStringExtra("RAD").isEmpty()) {
+                    String Tag = data.getStringExtra("TAG");
                     photoGallery = populateGallery(d1, d2, Tag);
+                }
+                else if (data.getStringExtra("TAG").isEmpty() && !data.getStringExtra("RAD").isEmpty()) {
+                    Double x = Double.valueOf(data.getStringExtra("LOCX"));
+                    Double y = Double.valueOf(data.getStringExtra("LOCY"));
+                    Double rad = Double.valueOf(data.getStringExtra("RAD"));
+                    photoGallery = populateGallery(d1, d2, x, y, rad);
                 }
                 else
                     photoGallery = populateGallery(d1, d2);
@@ -394,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     currentPhotoPath = photoGallery.get(currentPhotoIndex);
                     displayPhoto(currentPhotoPath);
 
-                    mySnackbar = Snackbar.make(findViewById(R.id.activity_main), String.valueOf(photoGallery.size()) + "Result(s) Found", Snackbar.LENGTH_SHORT);
+                    mySnackbar = Snackbar.make(findViewById(R.id.activity_main), String.valueOf(photoGallery.size()) + " Result(s) Found", Snackbar.LENGTH_SHORT);
                 }
                 else
                 {

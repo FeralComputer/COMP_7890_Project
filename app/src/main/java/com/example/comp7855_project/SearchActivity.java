@@ -61,17 +61,33 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Intent i = new Intent();
-                if (!fromDate_Year.getText().toString().isEmpty() && !fromDate_Month.getText().toString().isEmpty() && !fromDate_Day.getText().toString().isEmpty() && !toDate_Year.getText().toString().isEmpty() && !toDate_Month.getText().toString().isEmpty() && !toDate_Day.getText().toString().isEmpty()) {
-                    i.putExtra("STARTDATE", String.format("%04d", Integer.valueOf(fromDate_Year.getText().toString())) + String.format("%02d", Integer.valueOf(fromDate_Month.getText().toString())) + String.format("%02d", Integer.valueOf(fromDate_Day.getText().toString())));
-                    i.putExtra("ENDDATE", String.format("%04d", Integer.valueOf(toDate_Year.getText().toString())) + String.format("%02d", Integer.valueOf(toDate_Month.getText().toString())) + String.format("%02d", Integer.valueOf(toDate_Day.getText().toString())));
-                    i.putExtra("TAG", Tag.getText().toString());
-                    setResult(RESULT_OK, i);
-                    finish();
-                }
-                else {
-                    Snackbar mySnackbar = Snackbar.make(findViewById(R.id.activity_search), "Invalid Parameter", Snackbar.LENGTH_SHORT);
-                    mySnackbar.show();
-                }
+                if (fromDate_Year.getText().toString().isEmpty())
+                    fromDate_Year.setText("0000");
+                if (fromDate_Month.getText().toString().isEmpty())
+                    fromDate_Month.setText("00");
+                if (fromDate_Day.getText().toString().isEmpty())
+                    fromDate_Day.setText("00");
+                if (toDate_Year.getText().toString().isEmpty())
+                    toDate_Year.setText("9999");
+                if (toDate_Month.getText().toString().isEmpty())
+                    toDate_Month.setText("00");
+                if (toDate_Day.getText().toString().isEmpty())
+                    toDate_Day.setText("00");
+
+                //if (!fromDate_Year.getText().toString().isEmpty() && !fromDate_Month.getText().toString().isEmpty() && !fromDate_Day.getText().toString().isEmpty() && !toDate_Year.getText().toString().isEmpty() && !toDate_Month.getText().toString().isEmpty() && !toDate_Day.getText().toString().isEmpty()) {
+                i.putExtra("STARTDATE", String.format("%04d", Integer.valueOf(fromDate_Year.getText().toString())) + String.format("%02d", Integer.valueOf(fromDate_Month.getText().toString())) + String.format("%02d", Integer.valueOf(fromDate_Day.getText().toString())));
+                i.putExtra("ENDDATE", String.format("%04d", Integer.valueOf(toDate_Year.getText().toString())) + String.format("%02d", Integer.valueOf(toDate_Month.getText().toString())) + String.format("%02d", Integer.valueOf(toDate_Day.getText().toString())));
+                i.putExtra("TAG", Tag.getText().toString());
+                i.putExtra("LOCX", location_X.getText().toString());
+                i.putExtra("LOCY", location_Y.getText().toString());
+                i.putExtra("RAD", location_Radius.getText().toString());
+                setResult(RESULT_OK, i);
+                finish();
+                //}
+                //else {
+                    //Snackbar mySnackbar = Snackbar.make(findViewById(R.id.activity_search), "Invalid Parameter", Snackbar.LENGTH_SHORT);
+                    //mySnackbar.show();
+                //}
 
             }
         });

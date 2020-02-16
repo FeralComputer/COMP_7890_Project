@@ -31,7 +31,7 @@ public class ExampleInstrumentedTest {
         Date date_future = new GregorianCalendar(2020, Calendar.FEBRUARY,20).getTime();
         System.out.println(date_now.toString());
         System.out.println(date_future.toString());
-        Search_Functions.populateGallery(appContext.MainActivity, date_now, date_future);
+        //Search_Functions.populateGallery(appContext.MainActivity, date_now, date_future);
 
     }
 }

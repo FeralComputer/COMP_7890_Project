@@ -20,14 +20,14 @@ import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 class SearchActivityTest {
 
     @get: Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    val activityRule = ActivityScenarioRule(SearchActivity::class.java)
 
     @Test
     fun onCreate() {
-        onView(withId(R.id.title_search)).check(matches(isDisplayed()))
+        onView(withId(R.id.search_LocationLabel)).check(matches(isDisplayed()))
+        onView(withId(R.id.search_LocationX)).check(matches(isDisplayed()))
         onView(withId(R.id.search_search)).check(matches(isDisplayed()))
-        onView(withId(R.id.search_cancel)).check(matches(isDisplayed()))
-        onView(withId(R.id.title_search)).check(matches(ViewMatchers.withText("Photogallery Application")))
+        onView(withId(R.id.title_search)).check(matches(ViewMatchers.withText("Search Library")))
     }
 
 

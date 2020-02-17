@@ -33,12 +33,13 @@ public class ExampleUnitTest {
     @Test
     public void search_isCorrect()
     {
+        MainActivity mainActivity = new MainActivity();
         Date date_now = new Date();
         Date date_future = new GregorianCalendar(2020, Calendar.FEBRUARY,20).getTime();
         System.out.println(date_now.toString());
         System.out.println(date_future.toString());
         ArrayList<String> photoGallery;
-        //photoGallery = Search_Functions.populateGallery(this, date_now, date_future);
+        photoGallery = Search_Functions.populateGallery(mainActivity, date_now, date_future);
 
     }
 

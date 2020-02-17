@@ -1,6 +1,8 @@
 package com.example.comp7855_project;
 
 import com.example.comp7855_project.Utils.Search_Functions;
+import com.example.comp7855_project.Utils.Util_functions;
+import com.google.android.gms.common.internal.Asserts;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,14 +35,29 @@ public class ExampleUnitTest {
     @Test
     public void search_isCorrect()
     {
-        MainActivity mainActivity = new MainActivity();
-        Date date_now = new Date();
-        Date date_future = new GregorianCalendar(2020, Calendar.FEBRUARY,20).getTime();
-        System.out.println(date_now.toString());
-        System.out.println(date_future.toString());
-        ArrayList<String> photoGallery;
-        photoGallery = Search_Functions.populateGallery(mainActivity, date_now, date_future);
+        double xval = 1;
+        double x = 1;
 
+        double yval = 1;
+        double y = 1;
+        double rad = 1;
+        assertEquals(true,Util_functions.check_distance(xval,x,yval,y,rad));
+
+         xval = 10;
+         x = 15;
+
+         yval = 10;
+         y = 15;
+         rad = 25;
+        assertEquals(true,Util_functions.check_distance(xval,x,yval,y,rad));
+
+         xval = 8;
+         x = 0;
+
+         yval = 10;
+         y = 0;
+         rad = 5;
+        assertEquals(false,Util_functions.check_distance(xval,x,yval,y,rad));
     }
 
 }

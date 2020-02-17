@@ -93,7 +93,8 @@ public class Search_Functions {
                     if(data != null && !data.get(1).equals("N/A")) {
                         Double xval = Double.valueOf(data.get(1));
                         Double yval = Double.valueOf(data.get(2));
-                        if (Math.sqrt((x - xval) * (x - xval) + (y - yval) * (y - yval)) < rad) {
+                        if(Util_functions.check_distance(xval,x,yval,y,rad))
+                        {
                             mainActivity.photoGallery.add(f.getPath());
                         }
                     }

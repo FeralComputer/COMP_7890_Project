@@ -4,6 +4,8 @@ import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.example.comp7855_project.Utils.Search_Functions;
+import com.example.comp7855_project.Utils.Util_functions;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -23,15 +25,9 @@ public class ExampleInstrumentedTest {
     @Test
     public void useAppContext() {
         // Context of the app under test.
-        MainActivity mainActivity = new MainActivity();
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.comp7855_project", appContext.getPackageName());
 
-        Date date_now = new Date();
-        Date date_future = new GregorianCalendar(2020, Calendar.FEBRUARY,20).getTime();
-        System.out.println(date_now.toString());
-        System.out.println(date_future.toString());
-        Search_Functions.populateGallery(mainActivity, date_now, date_future);
+        Util_functions util = new Util_functions();
+
 
     }
 }

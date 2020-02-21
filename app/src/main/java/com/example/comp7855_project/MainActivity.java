@@ -41,6 +41,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import com.example.comp7855_project.Social_Interface.Social_Share;
+import com.example.comp7855_project.Social_Interface.UploadPhotoTask;
 import com.example.comp7855_project.Utils.Search_Functions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -268,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btnShare:
                 String extra_text=((EditText)findViewById(R.id.entryCaption)).getText().toString();
-                Social_Share.share(extra_text,currentPhotoPath,this);
+                Social_Share.share(extra_text,currentPhotoPath,this); // new UploadPhotoTask(extra_text,currentPhotoPath,this).execute();
                 break;
             default:
                 break;

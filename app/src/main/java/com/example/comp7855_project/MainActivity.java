@@ -125,7 +125,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button btnFilter = (Button)findViewById(R.id.btnFilter);
         Button btnCamera = (Button)findViewById(R.id.btnCamera);
         Button btnShare = (Button)findViewById(R.id.btnShare);
+        Button btnUpload = (Button)findViewById(R.id.upload_tomcat);
 
+        btnUpload.setOnClickListener(this);
         btnLeft.setOnClickListener(this);
         btnRight.setOnClickListener(this);
         btnCamera.setOnClickListener(this);
@@ -270,6 +272,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnShare:
                 String extra_text=((EditText)findViewById(R.id.entryCaption)).getText().toString();
                 Social_Share.share(extra_text,currentPhotoPath,this); // new UploadPhotoTask(extra_text,currentPhotoPath,this).execute();
+                break;
+            case R.id.upload_tomcat:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://192.168.0.233:8083/webApp/"));
+                startActivity(browserIntent);
                 break;
             default:
                 break;
